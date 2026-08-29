@@ -1,72 +1,85 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte'
-	import ChapterNav from '$lib/components/ChapterNav.svelte'
-	import InterviewCard from '$lib/components/InterviewCard.svelte'
-	import Loader from '$lib/components/Loader.svelte'
-	import SiteHeader from '$lib/components/SiteHeader.svelte'
-	import { cards } from '$lib/stores/card.svelte'
-	import { loader } from '$lib/stores/loader.svelte'
-	import type { PageData } from './$types'
+	import { onMount, tick } from 'svelte';
+	import ChapterNav from '$lib/components/ChapterNav.svelte';
+	import InterviewCard from '$lib/components/InterviewCard.svelte';
+	import Loader from '$lib/components/Loader.svelte';
+	import SiteHeader from '$lib/components/SiteHeader.svelte';
+	import { cards } from '$lib/stores/card.svelte';
+	import { loader } from '$lib/stores/loader.svelte';
+	import type { PageData } from './$types';
 
-	let { data }: { data: PageData } = $props()
-	const { profile, projects } = data
+	let { data }: { data: PageData } = $props();
+	let profile = $derived(data.profile);
+	let projects = $derived(data.projects);
 
-	let dy = $state(16)
-	let printing = $state(false)
-	let coarse = $state(false)
+	let dy = $state(16);
+	let printing = $state(false);
+	let coarse = $state(false);
 
-	const current = $derived(profile.cards[cards.current])
+	const current = $derived(profile.cards[cards.current]);
 
 	function nav(i: number) {
-		if (i < 0 || i >= profile.cards.length || i === cards.current) return
-		dy = i > cards.current ? 16 : -16
-		cards.go(i)
+		if (i < 0 || i >= profile.cards.length || i === cards.current) return;
+		dy = i > cards.current ? 16 : -16;
+		cards.go(i);
 	}
-	const next = () => { dy = 16; cards.next() }
-	const prev = () => { dy = -16; cards.prev() }
+	const next = () => {
+		dy = 16;
+		cards.next();
+	};
+	const prev = () => {
+		dy = -16;
+		cards.prev();
+	};
 
-	let x0: number | null = null
-	function onTouchStart(e: TouchEvent) { x0 = e.touches[0].clientX }
+	let x0: number | null = null;
+	function onTouchStart(e: TouchEvent) {
+		x0 = e.touches[0].clientX;
+	}
 	function onTouchEnd(e: TouchEvent) {
-		if (x0 == null) return
-		const dx = e.changedTouches[0].clientX - x0
-		if (Math.abs(dx) > 48) (dx < 0 ? next : prev)()
-		x0 = null
+		if (x0 == null) return;
+		const dx = e.changedTouches[0].clientX - x0;
+		if (Math.abs(dx) > 48) (dx < 0 ? next : prev)();
+		x0 = null;
 	}
 
 	onMount(() => {
-		cards.setTotal(profile.cards.length)
-		coarse = matchMedia('(pointer: coarse)').matches
+		cards.setTotal(profile.cards.length);
+		coarse = matchMedia('(pointer: coarse)').matches;
 
 		function onKey(e: KeyboardEvent) {
-			if ((e.target as HTMLElement | null)?.matches('input, textarea')) return
-			if (e.key === 'ArrowRight') { e.preventDefault(); next() }
-			else if (e.key === 'ArrowLeft') { e.preventDefault(); prev() }
-			else if (/^[1-9]$/.test(e.key)) nav(Number(e.key) - 1)
+			if ((e.target as HTMLElement | null)?.matches('input, textarea')) return;
+			if (e.key === 'ArrowRight') {
+				e.preventDefault();
+				next();
+			} else if (e.key === 'ArrowLeft') {
+				e.preventDefault();
+				prev();
+			} else if (/^[1-9]$/.test(e.key)) nav(Number(e.key) - 1);
 			else if (e.key === '/') {
-				e.preventDefault()
-				const i = profile.cards.findIndex((c) => c.kind === 'contact')
-				if (i === -1) return
-				nav(i)
-				tick().then(() => document.getElementById('f-name')?.focus({ preventScroll: true }))
+				e.preventDefault();
+				const i = profile.cards.findIndex((c) => c.kind === 'contact');
+				if (i === -1) return;
+				nav(i);
+				tick().then(() => document.getElementById('f-name')?.focus({ preventScroll: true }));
 			}
 		}
-		const onBeforePrint = () => (printing = true)
-		const onAfterPrint = () => (printing = false)
+		const onBeforePrint = () => (printing = true);
+		const onAfterPrint = () => (printing = false);
 
-		window.addEventListener('keydown', onKey)
-		window.addEventListener('beforeprint', onBeforePrint)
-		window.addEventListener('afterprint', onAfterPrint)
+		window.addEventListener('keydown', onKey);
+		window.addEventListener('beforeprint', onBeforePrint);
+		window.addEventListener('afterprint', onAfterPrint);
 
 		// звукопроверка — асинхронная часть, колбэк при этом остаётся синхронным
-		loader.play().then(() => loader.finish())
+		loader.play().then(() => loader.finish());
 
 		return () => {
-			window.removeEventListener('keydown', onKey)
-			window.removeEventListener('beforeprint', onBeforePrint)
-			window.removeEventListener('afterprint', onAfterPrint)
-		}
-	})
+			window.removeEventListener('keydown', onKey);
+			window.removeEventListener('beforeprint', onBeforePrint);
+			window.removeEventListener('afterprint', onAfterPrint);
+		};
+	});
 </script>
 
 <svelte:head>
@@ -122,8 +135,8 @@
 			<button
 				type="button"
 				onclick={() => window.print()}
-				class="cursor-pointer underline underline-offset-2 hover:text-ink"
-			>печать</button>
+				class="cursor-pointer underline underline-offset-2 hover:text-ink">печать</button
+			>
 		</span>
 	</footer>
 </div>
