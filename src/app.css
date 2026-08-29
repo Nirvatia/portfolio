@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+
+/* утилиты смотрят на runtime-переменные — тёмная тема переключается медиазапросом */
+@theme inline {
+	--color-paper: var(--paper);
+	--color-ink: var(--ink);
+	--color-mut: var(--mut);
+	--color-line: var(--line);
+	--color-mark: var(--mark);
+	--font-serif: 'Newsreader', Georgia, serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+
+:root {
+	--paper: #f6f5f1;
+	--ink: #161513;
+	--mut: #6e6c66;
+	--line: #d8d5cc;
+	--mark: #c0442b;
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--paper: #131312;
+		--ink: #e8e6df;
+		--mut: #8b897f;
+		--line: #2b2b28;
+		--mark: #d05a3e;
+		color-scheme: dark;
+	}
+}
+
+@layer base {
+	body {
+		@apply bg-paper font-serif text-ink antialiased;
+		-webkit-tap-highlight-color: transparent;
+	}
+	::selection {
+		@apply bg-ink text-paper;
+	}
+	:focus-visible {
+		outline: 1px solid var(--ink);
+		outline-offset: 3px;
+	}
+}
+
+/* буквица */
+.dropcap::first-letter {
+	float: left;
+	font-size: 3.1em;
+	line-height: 0.72;
+	font-weight: 500;
+	padding-right: 0.12em;
+	margin-top: 0.06em;
+}
+
+/* висячая пунктуация (там, где браузер умеет) */
+.hang {
+	hanging-punctuation: first last;
+}
+
+@keyframes card-in {
+	from { opacity: 0; transform: translateY(var(--dy, 16px)); }
+}
+.card-in { animation: card-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes dot-pulse {
+	50% { opacity: 0.25; }
+}
+.dot-pulse { animation: dot-pulse 2.6s ease-in-out infinite; }
+
+@keyframes ln-in {
+	from { opacity: 0; transform: translateY(5px); }
+	to { opacity: 1; transform: none; }
+}
+.ln-in { animation: ln-in 0.45s ease both; }
+
+@keyframes rule-run {
+	to { transform: scaleX(1); }
+}
+.rule-run {
+	transform: scaleX(0);
+	transform-origin: left;
+	animation: rule-run 2.3s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation: none !important;
+		transition: none !important;
+	}
+}
+
+@media print {
+	html, body {
+		overflow: visible !important;
+		height: auto !important;
+	}
+}
