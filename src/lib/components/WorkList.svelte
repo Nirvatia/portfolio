@@ -1,7 +1,10 @@
 <script lang="ts">
-	import type { Project } from '$lib/types'
+	import type { Project } from '$lib/types';
+	
+	import Icon from '@iconify/svelte';
+	import arrowUpRight from '@iconify-icons/ph/arrow-up-right';
 
-	let { projects }: { projects: Project[] } = $props()
+	let { projects }: { projects: Project[] } = $props();
 </script>
 
 <div class="mt-[clamp(12px,2vh,20px)]">
@@ -22,22 +25,23 @@
 								target="_blank"
 								rel="noopener noreferrer"
 								class="text-[clamp(16px,2.2vw,22px)] text-ink no-underline transition-colors
-									group-hover:text-mark after:absolute after:inset-0 after:content-['']"
+		group-hover:text-mark after:absolute after:inset-0 after:content-[''] wrap-anywhere"
 							>
-								{project.title}<span
+								{project.title}<span class="sr-only"> — откроется в новой вкладке</span><span
 									aria-hidden="true"
-									class="ml-[0.4em] inline-block -translate-x-1 opacity-0 transition
-										group-hover:translate-x-0 group-hover:opacity-100"
-								>→</span>
+									class="ml-[0.4em] inline-flex -translate-x-1 opacity-0 transition
+			group-hover:translate-x-0 group-hover:opacity-100"
+									><Icon icon={arrowUpRight} class="text-current" /></span
+								>
 							</a>
 						{:else}
-							<span class="text-[clamp(16px,2.2vw,22px)]">{project.title}</span>
+							<span class="text-[clamp(16px,2.2vw,22px)] wrap-anywhere">{project.title}</span>
 						{/if}
 
 						<span class="ml-2 font-mono text-xs text-mut md:hidden">{project.year}</span>
 
 						{#if project.description}
-							<p class="mt-0.5 text-[clamp(13px,1.5vw,14px)] leading-normal text-mut">
+							<p class="mt-0.5 text-[clamp(13px,1.5vw,14px)] leading-normal text-mut wrap-anywhere">
 								{project.description}
 							</p>
 						{/if}

@@ -34,11 +34,10 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
+		"@iconify-icons/ph": "^2.0.0",
 		"@sanity/client": "^7.26.2",
 		"@sanity/image-url": "^2.1.1",
 		"@tailwindcss/vite": "^4.3.3",
-		"embla-carousel": "^8.6.0",
-		"embla-carousel-svelte": "^8.6.0",
 		"tailwindcss": "^4.3.3"
 	}
 }

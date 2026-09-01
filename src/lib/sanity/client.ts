@@ -1,13 +1,14 @@
-import { createClient } from '@sanity/client'
+import { createClient } from '@sanity/client';
 
-export const API_VERSION = '2025-01-01'
+export const API_VERSION = '2025-01-01';
 
-const projectId = import.meta.env.VITE_SANITY_PROJECT_ID as string
-const dataset = import.meta.env.VITE_SANITY_DATASET as string
+const projectId = import.meta.env.VITE_SANITY_PROJECT_ID as string | undefined;
+const dataset = import.meta.env.VITE_SANITY_DATASET as string | undefined;
 
-export const client = createClient({
-	projectId,
-	dataset,
-	apiVersion: API_VERSION,
-	useCdn: true
-})
+if (!projectId || !dataset) {
+	throw new Error('Sanity: не заданы VITE_SANITY_PROJECT_ID / VITE_SANITY_DATASET — проверь .env');
+}
+
+export const sanityConfig = { projectId, dataset, apiVersion: API_VERSION };
+
+export const client = createClient({ ...sanityConfig, useCdn: true });

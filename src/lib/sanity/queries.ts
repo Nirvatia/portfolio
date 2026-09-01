@@ -4,9 +4,9 @@ export const PROFILE_QUERY = /* groq */ `
 	status,
 	motto,
 	cards[]{ no, label, question, answer, marginalia, kind }
-}`
+}`;
 
 export const PROJECTS_QUERY = /* groq */ `
 *[_type == "project"] | order(order asc){
 	_id, title, year, description, tags, codeUrl, liveUrl
-}`
+}`;

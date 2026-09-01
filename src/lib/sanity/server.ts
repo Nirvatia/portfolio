@@ -1,14 +1,15 @@
-import { createClient } from '@sanity/client'
-import { SANITY_API_TOKEN } from '$env/static/private'
-import { API_VERSION } from './client'
+import { createClient } from '@sanity/client';
+import { SANITY_API_TOKEN } from '$env/static/private';
+import { sanityConfig } from './client';
 
-const projectId = import.meta.env.VITE_SANITY_PROJECT_ID as string
-const dataset = import.meta.env.VITE_SANITY_DATASET as string
+if (!SANITY_API_TOKEN) {
+	throw new Error(
+		'Sanity: не задан SANITY_API_TOKEN — добавь его в .env (локально) и в env Vercel'
+	);
+}
 
 export const writeClient = createClient({
-	projectId,
-	dataset,
-	apiVersion: API_VERSION,
+	...sanityConfig,
 	token: SANITY_API_TOKEN,
 	useCdn: false
-})
+});

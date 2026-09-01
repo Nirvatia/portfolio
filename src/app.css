@@ -1,6 +1,39 @@
 @import 'tailwindcss';
 
-/* утилиты смотрят на runtime-переменные — тёмная тема переключается медиазапросом */
+/* свои шрифты */
+@font-face {
+	font-family: 'IBM Plex Mono';
+	src: url('/fonts/ibm-plex-mono-400.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'IBM Plex Mono';
+	src: url('/fonts/ibm-plex-mono-500.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Newsreader';
+	src: url('/fonts/newsreader-roman.woff2') format('woff2');
+	font-weight: 200 800;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Newsreader';
+	src: url('/fonts/newsreader-italic.woff2') format('woff2');
+	font-weight: 200 800;
+	font-style: italic;
+	font-display: swap;
+}
+
+/* утилиты смотрят на runtime-переменные; палитра одна — тёмная */
 @theme inline {
 	--color-paper: var(--paper);
 	--color-ink: var(--ink);
@@ -12,23 +45,12 @@
 }
 
 :root {
-	--paper: #f6f5f1;
-	--ink: #161513;
-	--mut: #6e6c66;
-	--line: #d8d5cc;
-	--mark: #c0442b;
-	color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		--paper: #131312;
-		--ink: #e8e6df;
-		--mut: #8b897f;
-		--line: #2b2b28;
-		--mark: #d05a3e;
-		color-scheme: dark;
-	}
+	--paper: #131312;
+	--ink: #e8e6df;
+	--mut: #8b897f;
+	--line: #2b2b28;
+	--mark: #d05a3e;
+	color-scheme: dark;
 }
 
 @layer base {
@@ -61,24 +83,47 @@
 }
 
 @keyframes card-in {
-	from { opacity: 0; transform: translateY(var(--dy, 16px)); }
+	from {
+		opacity: 0;
+		transform: translateY(var(--dy, 16px));
+	}
 }
-.card-in { animation: card-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.card-in {
+	animation: card-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
 @keyframes dot-pulse {
-	50% { opacity: 0.25; }
+	50% {
+		opacity: 0.25;
+	}
 }
-.dot-pulse { animation: dot-pulse 2.6s ease-in-out infinite; }
+
+.dot-pulse {
+	animation: dot-pulse 2.6s ease-in-out infinite;
+}
 
 @keyframes ln-in {
-	from { opacity: 0; transform: translateY(5px); }
-	to { opacity: 1; transform: none; }
+	from {
+		opacity: 0;
+		transform: translateY(5px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
-.ln-in { animation: ln-in 0.45s ease both; }
+
+.ln-in {
+	animation: ln-in 0.45s ease both;
+}
 
 @keyframes rule-run {
-	to { transform: scaleX(1); }
+	to {
+		transform: scaleX(1);
+	}
 }
+
 .rule-run {
 	transform: scaleX(0);
 	transform-origin: left;
@@ -86,15 +131,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	*, *::before, *::after {
+	*,
+	*::before,
+	*::after {
 		animation: none !important;
 		transition: none !important;
-	}
-}
-
-@media print {
-	html, body {
-		overflow: visible !important;
-		height: auto !important;
 	}
 }

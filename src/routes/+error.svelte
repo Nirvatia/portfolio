@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { page } from '$app/state'
+	import { page } from '$app/state';
 </script>
+
+<svelte:head>
+	<title>{page.status} — ошибка</title>
+</svelte:head>
 
 <div class="grid min-h-dvh place-items-center bg-paper px-6 text-ink">
 	<div class="max-w-md">

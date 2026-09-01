@@ -9,11 +9,10 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
 	let profile = $derived(data.profile);
 	let projects = $derived(data.projects);
-
 	let dy = $state(16);
-	let printing = $state(false);
 	let coarse = $state(false);
 
 	const current = $derived(profile.cards[cards.current]);
@@ -23,24 +22,51 @@
 		dy = i > cards.current ? 16 : -16;
 		cards.go(i);
 	}
+
 	const next = () => {
 		dy = 16;
 		cards.next();
 	};
+
 	const prev = () => {
 		dy = -16;
 		cards.prev();
 	};
 
-	let x0: number | null = null;
-	function onTouchStart(e: TouchEvent) {
-		x0 = e.touches[0].clientX;
+	function isInteractiveTarget(target: EventTarget | null) {
+		const el = target instanceof HTMLElement ? target : null;
+
+		return !!el?.closest(
+			'input, textarea, select, button, a[href], [contenteditable="true"], [role="button"], [role="link"]'
+		);
 	}
+
+	let x0: number | null = null;
+	let swipeInField = false;
+
+	function onTouchStart(e: TouchEvent) {
+		if (!loader.finished) return;
+
+		const el = e.target instanceof Element ? e.target : null;
+
+		swipeInField = !!el?.closest('input, textarea, select, button, [contenteditable="true"]');
+		x0 = e.touches[0]?.clientX ?? null;
+	}
+
 	function onTouchEnd(e: TouchEvent) {
-		if (x0 == null) return;
+		if (x0 === null) return;
+
 		const dx = e.changedTouches[0].clientX - x0;
-		if (Math.abs(dx) > 48) (dx < 0 ? next : prev)();
+		const blocked = swipeInField;
+
 		x0 = null;
+		swipeInField = false;
+
+		if (blocked) return;
+
+		if (Math.abs(dx) > 48) {
+			(dx < 0 ? next : prev)();
+		}
 	}
 
 	onMount(() => {
@@ -48,36 +74,37 @@
 		coarse = matchMedia('(pointer: coarse)').matches;
 
 		function onKey(e: KeyboardEvent) {
-			if ((e.target as HTMLElement | null)?.matches('input, textarea')) return;
+			if (isInteractiveTarget(e.target)) return;
+
 			if (e.key === 'ArrowRight') {
 				e.preventDefault();
 				next();
 			} else if (e.key === 'ArrowLeft') {
 				e.preventDefault();
 				prev();
-			} else if (/^[1-9]$/.test(e.key)) nav(Number(e.key) - 1);
-			else if (e.key === '/') {
+			} else if (/^[1-9]$/.test(e.key)) {
+				nav(Number(e.key) - 1);
+			} else if (e.key === '/') {
 				e.preventDefault();
+
 				const i = profile.cards.findIndex((c) => c.kind === 'contact');
 				if (i === -1) return;
+
 				nav(i);
 				tick().then(() => document.getElementById('f-name')?.focus({ preventScroll: true }));
 			}
 		}
-		const onBeforePrint = () => (printing = true);
-		const onAfterPrint = () => (printing = false);
 
 		window.addEventListener('keydown', onKey);
-		window.addEventListener('beforeprint', onBeforePrint);
-		window.addEventListener('afterprint', onAfterPrint);
+		window.addEventListener('touchstart', onTouchStart);
+		window.addEventListener('touchend', onTouchEnd);
 
-		// звукопроверка — асинхронная часть, колбэк при этом остаётся синхронным
 		loader.play().then(() => loader.finish());
 
 		return () => {
 			window.removeEventListener('keydown', onKey);
-			window.removeEventListener('beforeprint', onBeforePrint);
-			window.removeEventListener('afterprint', onAfterPrint);
+			window.removeEventListener('touchstart', onTouchStart);
+			window.removeEventListener('touchend', onTouchEnd);
 		};
 	});
 </script>
@@ -89,40 +116,28 @@
 <Loader />
 
 <div
-	class="mx-auto grid h-dvh max-w-[1040px] grid-rows-[auto_1fr_auto_auto]
+	class="mx-auto grid h-dvh max-w-260 grid-rows-[auto_1fr_auto_auto]
 		gap-[clamp(10px,1.6vh,16px)] px-[clamp(16px,4vw,24px)]
-		pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(14px+env(safe-area-inset-bottom))]
-		print:block print:h-auto"
+		pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(14px+env(safe-area-inset-bottom))]"
 >
 	<SiteHeader name={profile.name} status={profile.status} />
 
 	<div
-		class="relative flex touch-pan-y overflow-y-auto [scrollbar-width:none]
-			[&::-webkit-scrollbar]:hidden print:block print:overflow-visible"
-		ontouchstart={onTouchStart}
-		ontouchend={onTouchEnd}
+		class="relative flex touch-pan-y overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
 		aria-live="polite"
 	>
-		{#if printing}
-			{#each profile.cards as card (card.no)}
-				<div class="mb-11">
-					<InterviewCard {card} {projects} />
-				</div>
-			{/each}
-		{:else}
-			{#key cards.current}
-				<div class="card-in m-auto min-h-0 w-full" style:--dy="{dy}px">
-					<InterviewCard card={current} {projects} />
-				</div>
-			{/key}
-		{/if}
+		{#key cards.current}
+			<div class="card-in m-auto min-h-0 w-full" style:--dy="{dy}px">
+				<InterviewCard card={current} {projects} />
+			</div>
+		{/key}
 	</div>
 
 	<ChapterNav items={profile.cards} onNav={nav} />
 
 	<footer
 		class="flex flex-wrap justify-between gap-x-5 gap-y-2 font-mono
-			text-[clamp(9.5px,1.2vw,10.5px)] tracking-[0.06em] text-mut print:hidden"
+			text-[clamp(9.5px,1.2vw,10.5px)] tracking-[0.06em] text-mut"
 	>
 		<span>здесь некуда скроллить — и это осознанно</span>
 		<span>
@@ -131,12 +146,6 @@
 			{:else}
 				← → или 1–{profile.cards.length} · «/» — к форме
 			{/if}
-			·
-			<button
-				type="button"
-				onclick={() => window.print()}
-				class="cursor-pointer underline underline-offset-2 hover:text-ink">печать</button
-			>
 		</span>
 	</footer>
 </div>
