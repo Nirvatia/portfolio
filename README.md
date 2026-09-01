@@ -1,42 +1,23 @@
-# sv
+# Nirvatia
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Интервью вместо портфолио. Один экран, ноль скроллов.
 
-## Creating a project
+Тёмная тема. Шрифты — Newsreader и IBM Plex Mono, лежат локально (`src/app.css`), от внешних сервисов сайт не зависит.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Стек
 
-```sh
-# create a new project
-npx sv create my-app
-```
+SvelteKit (Svelte 5) · Tailwind CSS 4 · Sanity · Vercel
 
-To recreate this project with the same configuration:
+## Структура
 
-```sh
-# recreate this project
-npx sv@0.17.0 create --template minimal --types ts --add eslint prettier --install npm personal-portfolio
-```
+- `src/lib/components` — карточка интервью, оглавление, форма, лоадер, шапка, список работ
+- `src/lib/sanity` — клиент чтения, GROQ-запросы, клиент записи
+- `src/lib/stores` — навигация по карточкам и состояние лоадера
+- `sanity/` — схемы и конфиг студии
+- тексты живут в Sanity, в коде их нет
 
-## Developing
+## Запуск
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
+npm i
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
