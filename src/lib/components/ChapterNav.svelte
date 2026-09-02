@@ -5,28 +5,34 @@
 	let { items, onNav }: { items: InterviewCard[]; onNav: (index: number) => void } = $props();
 </script>
 
-<nav
-	aria-label="Оглавление интервью"
-	class="flex flex-wrap items-baseline gap-x-2.5 gap-y-1.5 border-t border-line pt-[clamp(9px,1.4vh,13px)]"
->
-	{#each items as item, i (item.no)}
-		{@const active = i === cards.current}
-		<button
-			type="button"
-			onclick={() => onNav(i)}
-			aria-current={active ? 'true' : undefined}
-			class="cursor-pointer border-0 px-2 py-1.5 font-mono text-[11px] uppercase tracking-widest transition-colors {active
-				? 'bg-ink text-paper'
-				: 'bg-transparent text-mut hover:text-ink'}"
-		>
-			{item.label}
-		</button>
-	{/each}
-	<p class="ml-auto font-mono text-[11px] tracking-widest text-mut">
-		<span class="sr-only">Сейчас открыт вопрос {cards.current + 1} из {items.length}.</span>
-		<span aria-hidden="true">
-			<span class="text-mark">{String(cards.current + 1).padStart(2, '0')}</span>
-			/ {String(items.length).padStart(2, '0')}
-		</span>
-	</p>
+<nav aria-label="Оглавление интервью" class="border-t border-line pt-[clamp(9px,1.4vh,13px)]">
+	<div
+		class="grid gap-1 border border-line p-1
+			md:flex md:flex-wrap md:items-baseline md:gap-x-2.5 md:gap-y-1.5 md:border-0 md:p-0"
+		style="grid-template-columns: repeat({items.length}, minmax(0, 1fr))"
+	>
+		{#each items as item, i (item.no)}
+			{@const active = i === cards.current}
+			<button
+				type="button"
+				onclick={() => onNav(i)}
+				aria-current={active ? 'true' : undefined}
+				aria-label={item.label}
+				class="cursor-pointer border-0 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest transition-colors
+					md:px-2 md:py-1.5 {active
+					? 'bg-ink text-paper'
+					: 'bg-transparent text-mut hover:text-ink'}"
+			>
+				<span class="md:hidden">{item.no}</span>
+				<span class="hidden md:inline">{item.label}</span>
+			</button>
+		{/each}
+		<p class="hidden font-mono text-[11px] tracking-widest text-mut md:ml-auto md:block">
+			<span class="sr-only">Сейчас открыт вопрос {cards.current + 1} из {items.length}.</span>
+			<span aria-hidden="true">
+				<span class="text-mark">{String(cards.current + 1).padStart(2, '0')}</span>
+				/ {String(items.length).padStart(2, '0')}
+			</span>
+		</p>
+	</div>
 </nav>
