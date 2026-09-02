@@ -35,13 +35,13 @@
 								>
 							</a>
 						{:else}
-							<span class="text-[clamp(16px,2.2vw,22px)] wrap-anywhere">{project.title}</span>
+							<span class="text-[clamp(18px,2.2vw,24px)] wrap-anywhere">{project.title}</span>
 						{/if}
 
 						<span class="ml-2 font-mono text-xs text-mut md:hidden">{project.year}</span>
 
 						{#if project.description}
-							<p class="mt-0.5 text-[clamp(13px,1.5vw,14px)] leading-normal text-mut wrap-anywhere">
+							<p class="mt-0.5 text-[clamp(15px,1.5vw,16px)] leading-normal text-mut wrap-anywhere">
 								{project.description}
 							</p>
 						{/if}

@@ -116,9 +116,10 @@
 <Loader />
 
 <div
-	class="mx-auto grid h-dvh max-w-260 grid-rows-[auto_1fr_auto_auto]
+	class="mx-auto grid h-dvh max-w-260 grid-rows-[auto_1fr_auto]
 		gap-[clamp(10px,1.6vh,16px)] px-[clamp(16px,4vw,24px)]
-		pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(14px+env(safe-area-inset-bottom))]"
+		pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(14px+env(safe-area-inset-bottom))]
+		md:grid-rows-[auto_1fr_auto_auto]"
 >
 	<SiteHeader name={profile.name} status={profile.status} />
 
@@ -136,8 +137,8 @@
 	<ChapterNav items={profile.cards} onNav={nav} />
 
 	<footer
-		class="flex flex-wrap justify-between gap-x-5 gap-y-2 font-mono
-			text-[clamp(9.5px,1.2vw,10.5px)] tracking-[0.06em] text-mut"
+		class="hidden flex-wrap justify-between gap-x-5 gap-y-2 font-mono
+		text-[clamp(9.5px,1.2vw,10.5px)] tracking-[0.06em] text-mut md:flex"
 	>
 		<span>здесь некуда скроллить — и это осознанно</span>
 		<span>
