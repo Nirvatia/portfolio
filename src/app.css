@@ -47,9 +47,9 @@
 :root {
 	--paper: #131312;
 	--ink: #e8e6df;
-	--mut: #8b897f;
+	--mut: #a6a396; /* было #8b897f · 5.3:1 → 7.35:1 */
 	--line: #2b2b28;
-	--mark: #d05a3e;
+	--mark: #ef8465; /* было #d05a3e · 4.6:1 → 7.2:1 */
 	color-scheme: dark;
 }
 
