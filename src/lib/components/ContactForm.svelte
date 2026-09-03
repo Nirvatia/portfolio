@@ -183,8 +183,9 @@
 
 		<p
 			role="alert"
+			aria-hidden={formState === 'error' ? undefined : 'true'}
 			class="min-h-[1.5em] text-sm leading-normal text-mut transition-opacity duration-200
-				{formState === 'error' ? 'opacity-100' : 'opacity-0'}"
+		{formState === 'error' ? 'opacity-100' : 'opacity-0'}"
 		>
 			Не ушло. Попробуй ещё раз.
 		</p>

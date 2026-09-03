@@ -21,7 +21,7 @@
 					<div class="min-w-0">
 						{#if project.liveUrl ?? project.codeUrl}
 							<a
-								href={project.liveUrl ?? project.codeUrl}
+								href={project.liveUrl || project.codeUrl}
 								target="_blank"
 								rel="noopener noreferrer"
 								class="text-[clamp(16px,2.2vw,22px)] text-ink no-underline transition-colors

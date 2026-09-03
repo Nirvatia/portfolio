@@ -5,14 +5,26 @@ export default defineType({
   title: 'Карточка интервью',
   type: 'object',
   fields: [
-    defineField({name: 'no', title: 'Номер', type: 'string', description: '01, 02…'}),
+    defineField({
+      name: 'no',
+      title: 'Номер',
+      type: 'string',
+      description: '01, 02…',
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: 'label',
       title: 'Метка',
       type: 'string',
       description: 'Короткое имя для оглавления',
+      validation: (rule) => rule.required(),
     }),
-    defineField({name: 'question', title: 'Вопрос', type: 'string'}),
+    defineField({
+      name: 'question',
+      title: 'Вопрос',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: 'answer',
       title: 'Ответ',
@@ -33,6 +45,7 @@ export default defineType({
           {title: 'Форма', value: 'contact'},
         ],
       },
+      validation: (rule) => rule.required(),
     }),
   ],
   preview: {select: {title: 'question', subtitle: 'no'}},

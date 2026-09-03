@@ -17,28 +17,44 @@
 
 	const current = $derived(profile.cards[cards.current]);
 
-	function nav(i: number) {
+	async function focusCurrentCard() {
+		await tick();
+
+		const el = document.getElementById(`card-question-${cards.current}`);
+		el?.focus({ preventScroll: true });
+	}
+
+	function nav(i: number, focusAfter = true) {
 		if (i < 0 || i >= profile.cards.length || i === cards.current) return;
+
 		dy = i > cards.current ? 16 : -16;
 		cards.go(i);
+
+		if (focusAfter) {
+			void focusCurrentCard();
+		}
 	}
 
 	const next = () => {
+		if (!cards.total) return;
+
 		dy = 16;
 		cards.next();
+		void focusCurrentCard();
 	};
 
 	const prev = () => {
+		if (!cards.total) return;
+
 		dy = -16;
 		cards.prev();
+		void focusCurrentCard();
 	};
 
-	function isInteractiveTarget(target: EventTarget | null) {
+	function isTypingTarget(target: EventTarget | null) {
 		const el = target instanceof HTMLElement ? target : null;
 
-		return !!el?.closest(
-			'input, textarea, select, button, a[href], [contenteditable="true"], [role="button"], [role="link"]'
-		);
+		return !!el?.closest('input, textarea, select, [contenteditable="true"]');
 	}
 
 	let x0: number | null = null;
@@ -74,7 +90,7 @@
 		coarse = matchMedia('(pointer: coarse)').matches;
 
 		function onKey(e: KeyboardEvent) {
-			if (isInteractiveTarget(e.target)) return;
+			if (isTypingTarget(e.target)) return;
 
 			if (e.key === 'ArrowRight') {
 				e.preventDefault();
@@ -90,8 +106,9 @@
 				const i = profile.cards.findIndex((c) => c.kind === 'contact');
 				if (i === -1) return;
 
-				nav(i);
-				tick().then(() => document.getElementById('f-name')?.focus({ preventScroll: true }));
+				nav(i, false);
+
+				void tick().then(() => document.getElementById('f-name')?.focus({ preventScroll: true }));
 			}
 		}
 
@@ -125,16 +142,23 @@
 
 	<div
 		class="relative flex touch-pan-y overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
-		aria-live="polite"
 	>
-		{#key cards.current}
-			<div class="card-in m-auto min-h-0 w-full" style:--dy="{dy}px">
-				<InterviewCard card={current} {projects} />
-			</div>
-		{/key}
+		{#if current}
+			{#key cards.current}
+				<div class="card-in m-auto min-h-0 w-full" style:--dy="{dy}px">
+					<InterviewCard card={current} {projects} questionId={`card-question-${cards.current}`} />
+				</div>
+			{/key}
+		{:else}
+			<p class="m-auto font-mono text-xs uppercase tracking-widest text-mut">
+				Карточки пока не заполнены
+			</p>
+		{/if}
 	</div>
 
-	<ChapterNav items={profile.cards} onNav={nav} />
+	{#if profile.cards.length > 0}
+		<ChapterNav items={profile.cards} onNav={nav} />
+	{/if}
 
 	<footer
 		class="hidden flex-wrap justify-between gap-x-5 gap-y-2 font-mono

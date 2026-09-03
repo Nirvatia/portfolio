@@ -2,10 +2,17 @@
 	import type { InterviewCard as CardData, Project } from '$lib/types';
 	import ContactForm from './ContactForm.svelte';
 	import WorkList from './WorkList.svelte';
+	let {
+		card,
+		projects = [],
+		questionId
+	}: {
+		card: CardData;
+		projects?: Project[];
+		questionId?: string;
+	} = $props();
 
-	let { card, projects = [] }: { card: CardData; projects?: Project[] } = $props();
-
-	const questionId = $derived(`card-question-${card.no}`);
+	const resolvedQuestionId = $derived(questionId ?? `card-question-${card.no}`);
 
 	/** Сначала полное экранирование, потом *звёздочки* → красное курсивное. */
 	function emphasize(text: string): string {
@@ -18,7 +25,7 @@
 </script>
 
 <section
-	aria-labelledby={questionId}
+	aria-labelledby={resolvedQuestionId}
 	class="grid grid-cols-[minmax(0,1fr)_clamp(150px,19vw,205px)] items-start
 		gap-x-[clamp(24px,4vw,40px)] max-md:grid-cols-1"
 >
@@ -31,9 +38,10 @@
 		</div>
 
 		<h2
-			id={questionId}
+			id={resolvedQuestionId}
+			tabindex="-1"
 			class="hang ml-[-2ch] mb-[clamp(10px,1.8vh,18px)] font-mono font-normal
-				text-[clamp(12px,1.5vw,13px)] tracking-[0.04em] text-mut"
+		text-[clamp(12px,1.5vw,13px)] tracking-[0.04em] text-mut"
 		>
 			— {card.question}
 		</h2>

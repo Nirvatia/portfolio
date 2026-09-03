@@ -11,20 +11,22 @@
 			md:flex md:flex-wrap md:items-baseline md:gap-x-2.5 md:gap-y-1.5 md:border-0 md:p-0"
 		style="grid-template-columns: repeat({items.length}, minmax(0, 1fr))"
 	>
-		{#each items as item, i (item.no)}
+		{#each items as item, i (`${i}:${item.no ?? ''}`)}
 			{@const active = i === cards.current}
+			{@const fallbackNo = String(i + 1).padStart(2, '0')}
+			{@const labelText = item.label || item.question || `Раздел ${item.no || fallbackNo}`}
 			<button
 				type="button"
 				onclick={() => onNav(i)}
-				aria-current={active ? 'true' : undefined}
-				aria-label={item.label}
+				aria-current={active ? 'step' : undefined}
+				aria-label={labelText}
 				class="cursor-pointer border-0 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest transition-colors
-					md:px-2 md:py-1.5 {active
-					? 'bg-ink text-paper'
-					: 'bg-transparent text-mut hover:text-ink'}"
+			md:px-2 md:py-1.5 {active ? 'bg-ink text-paper' : 'bg-transparent text-mut hover:text-ink'}"
 			>
-				<span class="md:hidden">{item.no}</span>
-				<span class="hidden md:inline">{item.label}</span>
+				<span class="md:hidden">{item.no || fallbackNo}</span>
+				<span class="hidden md:inline">
+					{item.label || item.no || fallbackNo}
+				</span>
 			</button>
 		{/each}
 		<p class="hidden font-mono text-[11px] tracking-widest text-mut md:ml-auto md:block">
