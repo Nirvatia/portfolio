@@ -1,9 +1,9 @@
 export const LOADER_LINES = [
-	'— Запись идёт?',
-	'Идёт.',
-	'— Начнём сразу?',
-	'Давайте без разминки.',
-	'— Тогда начали.'
+	'балласт принят',
+	'корпус герметичен',
+	'связь с поверхностью есть',
+	'начало погружения',
+	'шлюз · −12 м'
 ];
 
 const FIRST_DELAY_MS = 350;
@@ -22,32 +22,22 @@ export const loader = {
 	get finished() {
 		return finished;
 	},
-
-	/** Играет звукопроверку; при prefers-reduced-motion не задерживает вход. */
 	async play() {
 		const reduceMotion =
 			typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 		if (reduceMotion) {
 			shown = LOADER_LINES.length;
 			return;
 		}
-
 		const started = Date.now();
-
 		for (let i = 0; i < LOADER_LINES.length; i++) {
 			const wait = FIRST_DELAY_MS + i * LINE_STEP_MS - (Date.now() - started);
-
 			if (wait > 0) await sleep(wait);
-
 			shown = i + 1;
 		}
-
 		const rest = MIN_SHOW_MS - (Date.now() - started);
-
 		if (rest > 0) await sleep(rest);
 	},
-
 	finish() {
 		finished = true;
 	}

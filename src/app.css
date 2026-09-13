@@ -33,7 +33,7 @@
 	font-display: swap;
 }
 
-/* утилиты смотрят на runtime-переменные; палитра одна — тёмная */
+/* утилиты смотрят на runtime-переменные; палитра — глубина океана */
 @theme inline {
 	--color-paper: var(--paper);
 	--color-ink: var(--ink);
@@ -45,24 +45,73 @@
 }
 
 :root {
-	--paper: #131312;
-	--ink: #e8e6df;
-	--mut: #a6a396; /* было #8b897f · 5.3:1 → 7.35:1 */
-	--line: #2b2b28;
-	--mark: #ef8465; /* было #d05a3e · 4.6:1 → 7.2:1 */
+	--paper: #050910;
+	--ink: #d7e4e9;
+	--mut: #7d97a3;
+	--line: #14222e;
+	--mark: #6fcfd6;
+	--depth: 0;
 	color-scheme: dark;
 }
 
+/* базовый сброс */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: linear-gradient(180deg, #08111b 0%, #050910 45%, #03070d 100%);
+	color: var(--ink);
+	font-family: var(--font-serif);
+	-webkit-font-smoothing: antialiased;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* свет поверхности — гаснет с глубиной */
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background: radial-gradient(
+		ellipse 90% 55% at 50% -14%,
+		rgba(111, 207, 214, 0.10),
+		transparent 66%
+	);
+	opacity: calc(0.85 - var(--depth, 0) * 0.85);
+	transition: opacity 1.4s ease;
+}
+
+/* мгла дна — чернеет с глубиной */
+body::after {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background: #010206;
+	opacity: calc(var(--depth, 0) * 0.92);
+	transition: opacity 1.4s ease;
+}
+
+::selection {
+	background: var(--ink);
+	color: var(--paper);
+}
+
+/* в @layer, чтобы утилиты могли переопределять базовый фокус */
 @layer base {
-	body {
-		@apply bg-paper font-serif text-ink antialiased;
-		-webkit-tap-highlight-color: transparent;
-	}
-	::selection {
-		@apply bg-ink text-paper;
-	}
 	:focus-visible {
-		outline: 1px solid var(--ink);
+		outline: 1px solid var(--mark);
 		outline-offset: 3px;
 	}
 }
@@ -77,7 +126,7 @@
 	margin-top: 0.06em;
 }
 
-/* висячая пунктуация (там, где браузер умеет) */
+/* висячая пунктуация */
 .hang {
 	hanging-punctuation: first last;
 }
@@ -128,6 +177,22 @@
 	transform: scaleX(0);
 	transform-origin: left;
 	animation: rule-run 2.3s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+}
+
+/* сонар для лоадера */
+@keyframes ping {
+	0% {
+		transform: scale(0.15);
+		opacity: 0.65;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 0;
+	}
+}
+
+.ping {
+	animation: ping 2.8s ease-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

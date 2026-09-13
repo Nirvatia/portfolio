@@ -2,14 +2,20 @@
 	import type { InterviewCard as CardData, Project } from '$lib/types';
 	import ContactForm from './ContactForm.svelte';
 	import WorkList from './WorkList.svelte';
+	import { formatDepth } from '$lib/ocean/depth';
+
 	let {
 		card,
 		projects = [],
-		questionId
+		questionId,
+		depth,
+		zone
 	}: {
 		card: CardData;
 		projects?: Project[];
 		questionId?: string;
+		depth?: number;
+		zone?: string;
 	} = $props();
 
 	const resolvedQuestionId = $derived(questionId ?? `card-question-${card.no}`);
@@ -34,7 +40,12 @@
 			aria-hidden="true"
 			class="mb-[clamp(8px,1.4vh,14px)] font-mono text-[11px] tracking-[0.2em] text-mut"
 		>
-			{card.no}
+			{#if depth !== undefined && zone}
+				<span class="text-mark">{formatDepth(depth)}</span>
+				<span> · {zone}</span>
+			{:else}
+				{card.no}
+			{/if}
 		</div>
 
 		<h2

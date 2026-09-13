@@ -13,11 +13,25 @@
 	let emailEl: HTMLInputElement | undefined = $state();
 	let messageEl: HTMLTextAreaElement | undefined = $state();
 
-	const field =
-		'w-full border-0 border-b border-line bg-transparent py-1 font-serif text-base text-ink ' +
-		'caret-mark outline-none transition-colors focus:border-mark focus-visible:outline-none';
-
 	const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+	/* поле: прозрачный фон, волосок снизу; при фокусе волосок гаснет — его заменяет нить */
+	const field =
+		'peer w-full border-b border-line bg-transparent py-2 font-serif text-base ' +
+		'normal-case tracking-normal text-ink caret-mark outline-none transition-colors duration-300 ' +
+		'focus:border-transparent focus-visible:outline-none';
+
+	/* светящаяся нить под полем: видна при фокусе, при ошибке — постоянно */
+	const wire = (invalid: boolean) =>
+		'pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-mark to-transparent ' +
+		'shadow-[0_6px_18px_-6px_rgba(111,207,214,0.55)] transition-opacity duration-300 ' +
+		(invalid ? 'opacity-100' : 'opacity-0 peer-focus:opacity-100');
+
+	const labelCls = 'grid gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-mut';
+	const errCls = (show: boolean) =>
+		'min-h-[1.5em] font-mono text-[11px] leading-normal tracking-[0.06em] normal-case text-mark ' +
+		'transition-opacity duration-200 ' +
+		(show ? 'opacity-100' : 'opacity-0');
 
 	const validateName = (v: string) => (!v ? 'представься — хотя бы одним словом' : '');
 	const validateEmail = (v: string) =>
@@ -37,7 +51,6 @@
 	async function handleSubmit(e: SubmitEvent & { currentTarget: HTMLFormElement }) {
 		e.preventDefault();
 		if (formState === 'sending') return;
-
 		const fd = new FormData(e.currentTarget);
 		const payload = {
 			name: String(fd.get('name') ?? '').trim(),
@@ -56,7 +69,6 @@
 		}
 
 		formState = 'sending';
-
 		try {
 			const res = await fetch('/api/contact', {
 				method: 'POST',
@@ -79,20 +91,20 @@
 
 {#if formState === 'sent'}
 	<div class="card-in">
-		<p class="hang ml-[-2ch] mb-4 mt-[clamp(18px,3vh,28px)] font-mono text-[13px] text-mut">
+		<p class="hang mb-4 mt-[clamp(18px,3vh,28px)] ml-[-2ch] font-mono text-[13px] text-mut">
 			— И что дальше?
 		</p>
 		<p
 			role="status"
-			class="dropcap font-serif text-[clamp(21px,min(4.6vw,6vh),38px)] leading-[1.3] tracking-[-0.01em] wrap-anywhere"
+			class="dropcap wrap-anywhere font-serif text-[clamp(21px,min(4.6vw,6vh),38px)] leading-[1.3] tracking-[-0.01em]"
 		>
-			Спасибо, {sentName}. Сообщение ушло. Отвечу на {sentEmail}.
+			Спасибо, {sentName}. Сигнал передан. Отвечу на {sentEmail}.
 		</p>
 	</div>
 {:else}
 	<form
 		novalidate
-		class="relative mt-[clamp(14px,2.4vh,26px)] grid max-w-115 gap-[clamp(12px,1.8vh,18px)]"
+		class="relative mt-[clamp(14px,2.4vh,26px)] grid max-w-115 gap-[clamp(14px,2vh,20px)]"
 		aria-busy={formState === 'sending'}
 		onsubmit={handleSubmit}
 	>
@@ -103,89 +115,87 @@
 			</label>
 		</div>
 
-		<label class="grid gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-mut">
+		<label class={labelCls}>
 			имя
-			<input
-				bind:this={nameEl}
-				id="f-name"
-				name="name"
-				maxlength="200"
-				autocomplete="name"
-				class="{field} {errors.name ? 'border-mark' : ''}"
-				aria-invalid={errors.name ? true : undefined}
-				aria-describedby={errors.name ? 'err-name' : undefined}
-				oninput={(e) => liveCheck('name', e.currentTarget.value)}
-			/>
-			<p
-				id="err-name"
-				role="alert"
-				class="min-h-[1.5em] leading-normal normal-case text-[11px] tracking-[0.06em] text-mark
-					transition-opacity duration-200 {errors.name ? 'opacity-100' : 'opacity-0'}"
-			>
-				{errors.name}
-			</p>
+			<span class="relative block">
+				<input
+					bind:this={nameEl}
+					id="f-name"
+					name="name"
+					maxlength="200"
+					autocomplete="name"
+					class="{field} {errors.name ? 'border-transparent' : ''}"
+					aria-invalid={errors.name ? true : undefined}
+					aria-describedby={errors.name ? 'err-name' : undefined}
+					oninput={(e) => liveCheck('name', e.currentTarget.value)}
+				/>
+				<span aria-hidden="true" class={wire(!!errors.name)}></span>
+			</span>
+			<p id="err-name" role="alert" class={errCls(!!errors.name)}>{errors.name}</p>
 		</label>
 
-		<label class="grid gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-mut">
+		<label class={labelCls}>
 			почта
-			<input
-				bind:this={emailEl}
-				type="email"
-				name="email"
-				maxlength="320"
-				autocomplete="email"
-				class="{field} {errors.email ? 'border-mark' : ''}"
-				aria-invalid={errors.email ? true : undefined}
-				aria-describedby={errors.email ? 'err-email' : undefined}
-				oninput={(e) => liveCheck('email', e.currentTarget.value)}
-			/>
-			<p
-				id="err-email"
-				role="alert"
-				class="min-h-[1.5em] leading-normal normal-case text-[11px] tracking-[0.06em] text-mark
-					transition-opacity duration-200 {errors.email ? 'opacity-100' : 'opacity-0'}"
-			>
-				{errors.email}
-			</p>
+			<span class="relative block">
+				<input
+					bind:this={emailEl}
+					id="f-email"
+					type="email"
+					name="email"
+					maxlength="320"
+					autocomplete="email"
+					class="{field} {errors.email ? 'border-transparent' : ''}"
+					aria-invalid={errors.email ? true : undefined}
+					aria-describedby={errors.email ? 'err-email' : undefined}
+					oninput={(e) => liveCheck('email', e.currentTarget.value)}
+				/>
+				<span aria-hidden="true" class={wire(!!errors.email)}></span>
+			</span>
+			<p id="err-email" role="alert" class={errCls(!!errors.email)}>{errors.email}</p>
 		</label>
 
-		<label class="grid gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-mut">
+		<label class={labelCls}>
 			о чём речь
-			<textarea
-				bind:this={messageEl}
-				name="message"
-				maxlength="4000"
-				class="{field} min-h-[clamp(56px,10vh,80px)] resize-y leading-normal {errors.message
-					? 'border-mark'
-					: ''}"
-				aria-invalid={errors.message ? true : undefined}
-				aria-describedby={errors.message ? 'err-message' : undefined}
-				oninput={(e) => liveCheck('message', e.currentTarget.value)}></textarea>
-			<p
-				id="err-message"
-				role="alert"
-				class="min-h-[1.5em] leading-normal normal-case text-[11px] tracking-[0.06em] text-mark
-					transition-opacity duration-200 {errors.message ? 'opacity-100' : 'opacity-0'}"
-			>
-				{errors.message}
-			</p>
+			<span class="relative block">
+				<textarea
+					bind:this={messageEl}
+					name="message"
+					maxlength="4000"
+					class="{field} min-h-[clamp(56px,10vh,80px)] resize-y leading-normal {errors.message
+						? 'border-transparent'
+						: ''}"
+					aria-invalid={errors.message ? true : undefined}
+					aria-describedby={errors.message ? 'err-message' : undefined}
+					oninput={(e) => liveCheck('message', e.currentTarget.value)}></textarea>
+				<span aria-hidden="true" class={wire(!!errors.message)}></span>
+			</span>
+			<p id="err-message" role="alert" class={errCls(!!errors.message)}>{errors.message}</p>
 		</label>
 
-		<button
-			type="submit"
-			disabled={formState === 'sending'}
-			class="cursor-pointer justify-self-start border border-ink bg-transparent px-6 py-2.5
-				font-mono text-xs uppercase tracking-[0.14em] text-ink transition-colors
-				hover:bg-ink hover:text-paper disabled:cursor-default disabled:opacity-50"
-		>
-			{formState === 'sending' ? 'Уходит…' : 'Отправить'}
-		</button>
+<button
+	type="submit"
+	disabled={formState === 'sending'}
+	class="group inline-flex cursor-pointer items-center gap-3 justify-self-start rounded-[3px]
+		bg-mark/12 px-6 py-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-mark
+		shadow-[inset_0_1px_0_rgba(215,238,242,0.1)] transition-all duration-200
+		hover:bg-mark/20 hover:text-ink
+		hover:shadow-[inset_0_1px_0_rgba(215,238,242,0.14),0_10px_28px_-14px_rgba(111,207,214,0.5)]
+		active:translate-y-px disabled:cursor-default disabled:opacity-45"
+>
+	<span
+		aria-hidden="true"
+		class="size-1.5 flex-none rounded-full bg-mark shadow-[0_0_8px_rgba(111,207,214,0.9)]
+			transition-shadow duration-200 group-hover:shadow-[0_0_12px_rgba(111,207,214,1)]
+			{formState === 'sending' ? 'dot-pulse' : ''}"
+	></span>
+	{formState === 'sending' ? 'Передаю…' : 'Передать сигнал'}
+</button>
 
 		<p
 			role="alert"
 			aria-hidden={formState === 'error' ? undefined : 'true'}
 			class="min-h-[1.5em] text-sm leading-normal text-mut transition-opacity duration-200
-		{formState === 'error' ? 'opacity-100' : 'opacity-0'}"
+				{formState === 'error' ? 'opacity-100' : 'opacity-0'}"
 		>
 			Не ушло. Попробуй ещё раз.
 		</p>
