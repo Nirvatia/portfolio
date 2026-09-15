@@ -58,29 +58,6 @@
 		return !!el?.closest('input, textarea, select, [contenteditable="true"]');
 	}
 
-	let y0: number | null = null;
-	let swipeInField = false;
-
-	function onTouchStart(e: TouchEvent) {
-		if (!loader.finished) return;
-		const el = e.target instanceof Element ? e.target : null;
-		swipeInField = !!el?.closest('input, textarea, select, button, [contenteditable="true"]');
-		y0 = e.touches[0]?.clientY ?? null;
-	}
-
-	function onTouchEnd(e: TouchEvent) {
-		if (y0 === null) return;
-		const dySwipe = e.changedTouches[0].clientY - y0;
-		const blocked = swipeInField;
-		y0 = null;
-		swipeInField = false;
-		if (blocked) return;
-		if (Math.abs(dySwipe) > 48) {
-			// свайп вверх = погружение (глубже), свайп вниз = всплытие (мельче)
-			(dySwipe < 0 ? next : prev)();
-		}
-	}
-
 	onMount(() => {
 		cards.setTotal(profile.cards.length);
 		coarse = matchMedia('(pointer: coarse)').matches;
@@ -95,24 +72,14 @@
 				prev();
 			} else if (/^[1-9]$/.test(e.key)) {
 				nav(Number(e.key) - 1);
-			} else if (e.key === '/') {
-				e.preventDefault();
-				const i = profile.cards.findIndex((c) => c.kind === 'contact');
-				if (i === -1) return;
-				nav(i, false);
-				void tick().then(() => document.getElementById('f-name')?.focus({ preventScroll: true }));
 			}
 		}
 
 		window.addEventListener('keydown', onKey);
-		window.addEventListener('touchstart', onTouchStart);
-		window.addEventListener('touchend', onTouchEnd);
 		loader.play().then(() => loader.finish());
 
 		return () => {
 			window.removeEventListener('keydown', onKey);
-			window.removeEventListener('touchstart', onTouchStart);
-			window.removeEventListener('touchend', onTouchEnd);
 		};
 	});
 </script>
@@ -165,9 +132,9 @@
 		<span>здесь некуда скроллить — только погружаться</span>
 		<span>
 			{#if coarse}
-				свайп ↑↓ · оглавление выше
+				оглавление выше
 			{:else}
-				↑ ↓ или 1–{profile.cards.length} · «/» — к форме
+				↑ ↓ или 1–{profile.cards.length}
 			{/if}
 		</span>
 	</footer>
