@@ -175,18 +175,20 @@
 		<button
 			type="submit"
 			disabled={formState === 'sending'}
-			class="group inline-flex cursor-pointer items-center gap-3 justify-self-start rounded-[3px]
-		bg-mark/12 px-6 py-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-mark
-		shadow-[inset_0_1px_0_rgba(215,238,242,0.1)] transition-all duration-200
-		hover:bg-mark/20 hover:text-ink
-		hover:shadow-[inset_0_1px_0_rgba(215,238,242,0.14),0_10px_28px_-14px_rgba(111,207,214,0.5)]
-		active:translate-y-px disabled:cursor-default disabled:opacity-45"
+			class="inline-flex cursor-pointer items-center gap-2.5 justify-self-start
+		border border-mark/10 px-5 py-2.5
+		bg-[linear-gradient(180deg,rgba(111,207,214,0.08),rgba(111,207,214,0.02))]
+		font-mono text-xs uppercase tracking-[0.18em] text-mark
+		transition-all duration-200
+		hover:border-mark/15
+		hover:bg-[linear-gradient(180deg,rgba(111,207,214,0.16),rgba(111,207,214,0.04))]
+		active:translate-y-px
+		disabled:cursor-default disabled:opacity-45"
 		>
 			<span
 				aria-hidden="true"
-				class="size-1.5 flex-none rounded-full bg-mark shadow-[0_0_8px_rgba(111,207,214,0.9)]
-			transition-shadow duration-200 group-hover:shadow-[0_0_12px_rgba(111,207,214,1)]
-			{formState === 'sending' ? 'dot-pulse' : ''}"
+				class="dot-pulse size-1.5 flex-none rounded-full bg-mark
+			shadow-[0_0_8px_rgba(111,207,214,0.85)]"
 			></span>
 			{formState === 'sending' ? 'Передаю…' : 'Передать сигнал'}
 		</button>
